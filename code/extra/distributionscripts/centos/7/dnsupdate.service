@@ -1,0 +1,14 @@
+#copy this to /usr/lib/systemd/system/dnsupdate.service
+#systemctl enable dnsupdate
+#systemctl start dnsupdate
+
+[Unit]
+Description=DNS Updater for A and AAAA records
+
+[Service]
+Type=forking
+PIDFile=/run/dnsupdate.pid
+ExecStart=/usr/bin/dnsupdate --pidfile=/run/dnsupdate.pid
+
+[Install]
+WantedBy=multi-user.target

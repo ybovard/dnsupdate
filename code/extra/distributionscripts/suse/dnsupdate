@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# Startup script for dnsupdate
+#
+# chkconfig: 2345 65 38
+# description: DNS Updater for A and AAAA records
+# processname: dnsupdate
+# pidfile: /var/run/dnsupdate.pid
+
+### BEGIN INIT INFO
+# Provides:          dnsupdate
+# Required-Start:    $remote_fs $syslog $network
+# Required-Stop:     $remote_fs $syslog $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: DNS Updater for A and AAAA records
+# Description:       DNS Updater for A and AAAA records
+### END INIT INFO
+
+. /etc/rc.status
+
+# Reset status of this service
+rc_reset
+
+BIN=/usr/local/bin/dnsupdate
+PID=/var/run/dnsupdate.pid
+
+test -x $BIN || {
+        echo "$BIN not installed";
+        if [ "$1" = "stop" ] ; then
+                exit 0
+        else
+                exit 5
+        fi
+        }
+
+case "$1" in
+        start)
+                echo -n "Starting dnsupdate "
+                startproc $BIN
+                rc_status -v
+                ;;
+        stop)
+                echo -n "Stopping dnsupdate "
+                killproc -TERM $BIN
+				rm -f $PID
+                rc_status -v
+                ;;
+        restart)
+                $0 stop
+                $0 start
+                rc_status
+                ;;
+        reload)
+                echo -n "Reload dnsupdate config: "
+                killproc -HUP $BIN
+                rc_status -v
+                ;;
+        status)
+                echo -n "Checking for service dnsupdate "
+                checkproc $BIN
+                rc_status -v
+                ;;
+        *)
+                echo "Usage: $0 {start|stop|status|restart|reload}"
+        exit 1
+        ;;
+esac
+rc_exit

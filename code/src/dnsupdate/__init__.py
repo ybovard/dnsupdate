@@ -60,6 +60,7 @@ class Controller(object):
           self._currentIP.append(ip)
 
         completed, pending = yield from asyncio.wait(pretasks)
+        print('ahhhh')
         for t in pending:
           logging.warning("task {} not completed".format(t))
           
@@ -90,6 +91,7 @@ class Controller(object):
                   changed=True
                 else:
                   logging.info("no change found for {}".format(res[0]))
+
           if changed:
             ipTuple=[]
             for ip in self._currentIP:
@@ -107,6 +109,13 @@ class Controller(object):
 
 
           time.sleep(float(CONTROLLER.config['dnsupdate']['refresh_rate']))
+
+
+    @asyncio.coroutine
+    def _cancelTasks(self):
+        for task in asyncio.Task.all_tasks(self._loop):
+          logging.info("cancelling task {}".format(task))
+          task.cancel()
 
 
     def run(self):
@@ -137,10 +146,13 @@ class Controller(object):
                 
     
     def shutdown(self):
+        self.stay_alive=False
         self._shutdown()
     
     def _shutdown(self):
         logging.info("dnsupdate shutting down")
+        self._cancelTasks()
+        self._loop.run_until_complete(self._cancelTasks())
         self._loop.close()
         
     

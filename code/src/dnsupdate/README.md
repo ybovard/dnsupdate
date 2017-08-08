@@ -19,16 +19,16 @@ publishNew_auth: {}
 * Techno used: python3 asyncio
 * startup:
   [ ] prepare datastructure:
-    [ ] A if necessary
-    [ ] AAAA if necessary
+    [X] A if necessary
+    [X] AAAA if necessary
     [ ] prepare connection to registrar
     [ ] prepare connection to publisher
-    [ ] look for current IP in reg_ns
-  [ ] loop every refresh_rate seconds
+    [X] look for current IP in reg_ns
+  [X] loop every refresh_rate seconds
   [ ] asynchronously look for:
     [ ] current A rec in getA_class
     [ ] current AAAA rec in getAAAA_class
-  [ ] update datastructure
+  [X] update datastructure
   [ ] if new addresses:
     [ ] update registrar
     [ ] publish info

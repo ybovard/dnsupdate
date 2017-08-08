@@ -13,8 +13,30 @@ else:
   import configparser as CP
 
 from logging.handlers import SysLogHandler
+from .factory import Factory
+import asyncio
+
+class CurrentIP(object):
+  RRTYPE=None
+  RRNAME=None
+  RRVALUE=None
+
+  def update(self,val):
+    rc=True
+    if val==self.RRVALUE:
+      rc=False
+    else:
+      self.RRVALUE=val
+    return rc
+
 
 class Controller(object):
+    _loop=None
+    _registrar=None
+    _publisher=None
+    _currentIPClass=None
+    _currentIP=None
+
     def __init__(self,config):
         self.config=config
         self.stay_alive=True
@@ -26,30 +48,100 @@ class Controller(object):
         logging.info("Reloading dnsupdate")
         
     
+    @asyncio.coroutine
+    def pretasks(self):
+        pretasks=[]
+        self._currentIP=[]
+        for ipClass in self._currentIPClass:
+          pretasks.append(self._registrar.getIP(ipClass.RRTYPE))
+          ip=CurrentIP()
+          ip.RRTYPE=ipClass.RRTYPE
+          ip.RRNAME=ipClass.RRNAME
+          self._currentIP.append(ip)
+
+        completed, pending = yield from asyncio.wait(pretasks)
+        for t in pending:
+          logging.warning("task {} not completed".format(t))
+          
+        for t in completed:
+          res=t.result()
+          for ip in self._currentIP:
+            if ip.RRTYPE==res[0]:
+              logging.info("initialize current {} to {}".format(res[0], res[1]))
+              ip.update(res[1])
+          
+
+    @asyncio.coroutine
+    def mainloop(self):
+        while self.stay_alive:
+          tasks=[]
+          for ipClass in self._currentIPClass:
+            tasks.append(ipClass.get())
+          completed, pending = yield from asyncio.wait(tasks)
+          for t in pending:
+            logging.warning("task {} not completed".format(t))
+          for t in completed:
+            res=t.result()
+            changed=False
+            for ip in self._currentIP:
+              if ip.RRTYPE==res[0]:
+                if ip.update(res[1]):
+                  logging.info("{} has been updated to {}".format(res[0], res[1]))
+                  changed=True
+                else:
+                  logging.info("no change found for {}".format(res[0]))
+          if changed:
+            ipTuple=[]
+            for ip in self._currentIP:
+              ipTuple.append((ip.RRTYPE,ip.RRVALUE))
+            completed, pending = yield from asyncio.wait([self._registrar.update(ipTuple)])
+            if len(pending) == 0 :
+              logging.info("registrar updated")
+              completed, pending = yield from asyncio.wait([self._publisher.publish(ipTuple)])
+              if len(pending) == 0 :
+                logging.info("news published")
+              else:
+                logging.warning("news cannot be published")
+            else:
+              logging.warning("registrar cannot be updated")
+
+
+          time.sleep(float(CONTROLLER.config['dnsupdate']['refresh_rate']))
+
+
     def run(self):
-        ## TODO: PUT YOUR STARTUP CODE HERE
-        # start threads, etc, then run your main loop
-        
-        ## main loop of the program
-        # replace this with your main thread code 
-        # or just remove the demo log output after time.sleep if your main code runs in other threads
-        while self.stay_alive:    
-            try:
-                time.sleep(10)
-                logging.info("the dnsupdate daemon says: HELLO WORLD!")
-            except KeyboardInterrupt:
-                self.stay_alive=False
+        logging.debug('configuration loaded')
+        for sec in CONTROLLER.config.sections():
+          logging.debug('{: <2s}{}'.format(' ',sec))
+          for opt,val in CONTROLLER.config[sec].items():
+            logging.debug('{: <4s}{}: {}'.format(' ',opt,val))
+
+        facto=Factory()
+        self._registrar=facto.getRegistrar(CONTROLLER.config)
+        self._publisher=facto.getPublisher(CONTROLLER.config)
+        self._currentIPClass=facto.getWANIP(CONTROLLER.config)
+
+        logging.debug('registrar controller loaded: {}'.format(self._registrar.__class__.__name__))
+        logging.debug('publisher controller loaded: {}'.format(self._publisher.__class__.__name__))
+        logging.debug('currentIP datastructure loaded: {}'.format(self._currentIPClass))
+    
+        ## main looap of the program
+        self._loop=asyncio.get_event_loop()
+        try:
+          self._loop.run_until_complete(self.pretasks())
+          self._loop.run_until_complete(self.mainloop())
+        except KeyboardInterrupt:
+          self.stay_alive=False
+        finally:
+          self._shutdown()
                 
-        #main loop exit, call cleanup method
-        self._shutdown()
     
     def shutdown(self):
-        """Tell the main loop to exit and shut down gracefully"""
-        self.stay_alive=False
+        self._shutdown()
     
     def _shutdown(self):
-        ##TODO: PUT CODE HERE TO SHUT DOWN GRACEFULLY ##
         logging.info("dnsupdate shutting down")
+        self._loop.close()
         
     
 
@@ -77,20 +169,9 @@ def init_syslog_logging(level=logging.INFO):
 
 def reload_config():
     """reload configuration"""
-    ##
-    ##TODO: INSERT CODE TO LOAD YOUR CONFIGURATION HERE, eg. :  ##
-    #newconfig=CP.ConfigParser()
-    #newconfig.readfp(open(CONFIGFILE))
-
-    #dconfdir=os.path.join(os.path.dirname(CONFIGFILE),'conf.d')
-    #if os.path.isdir(dconfdir):
-    #    filelist=os.listdir(dconfdir)
-    #    configfiles=[dconfdir+'/'+c for c in filelist if c.endswith('.conf')]
-    #    readfiles=newconfig.read(configfiles)
-    #return newconfig
-
-    #we return a dummy dict by default
-    return {}
+    newconfig=CP.ConfigParser()
+    newconfig.readfp(open(CONFIGFILE))
+    return newconfig
 
 
 def sighup(signum,frame):

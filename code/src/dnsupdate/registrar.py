@@ -1,22 +1,22 @@
 import asyncio
+import aiodns
 
 class RegAbstract:
   CREDS=None
   NSLIST=[]
 
   @asyncio.coroutine
-  def getIP(self,rrtype):
+  def getIP(self,rrname,rrtype):
     pass
   def update(self,ipTuple):
     pass
 
 class RegGandi(RegAbstract):
   @asyncio.coroutine
-  def getIP(self,rrtype):
-    if rrtype=='A':
-      return ('A','127.0.0.1')
-    if rrtype=='AAAA':
-      return ('AAAA','::1')
+  def getIP(self,rrname,rrtype):
+    resolvers=aiodns.DNSResolver()
+    res=yield from asyncio.wait_for(resolvers.query(rrname,rrtype),timeout=5)
+    return (rrtype,res[0].host)
 
   @asyncio.coroutine
   def update(self,ipTuple):

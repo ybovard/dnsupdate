@@ -53,14 +53,13 @@ class Controller(object):
         pretasks=[]
         self._currentIP=[]
         for ipClass in self._currentIPClass:
-          pretasks.append(self._registrar.getIP(ipClass.RRTYPE))
+          pretasks.append(self._registrar.getIP('{}.'.format(ipClass.RRNAME),ipClass.RRTYPE))
           ip=CurrentIP()
           ip.RRTYPE=ipClass.RRTYPE
           ip.RRNAME=ipClass.RRNAME
           self._currentIP.append(ip)
 
         completed, pending = yield from asyncio.wait(pretasks)
-        print('ahhhh')
         for t in pending:
           logging.warning("task {} not completed".format(t))
           

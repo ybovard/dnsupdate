@@ -9,7 +9,7 @@ class Factory:
       from .registrar import RegGandi
       obj=RegGandi()
       obj.CREDS=config['dnsupdate']['registrar_creds']
-      obj.NSLIST=config['dnsupdate']['registrar_ns']
+      obj.NSLIST=config['dnsupdate']['registrar_ns'].split(',')
     else:
       raise UNKNOWN_REGISTRAR('unknown registrar {}'.format(config['dnsupdate']['registrar_class']))
     return obj

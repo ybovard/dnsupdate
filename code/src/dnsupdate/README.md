@@ -21,13 +21,13 @@ publishNew_auth: {}
   [ ] prepare datastructure:
     [X] A if necessary
     [X] AAAA if necessary
-    [ ] prepare connection to registrar
-    [ ] prepare connection to publisher
+    [X] prepare connection to registrar
+    [X] prepare connection to publisher
     [X] look for current IP in reg_ns
   [X] loop every refresh_rate seconds
-  [ ] asynchronously look for:
-    [ ] current A rec in getA_class
-    [ ] current AAAA rec in getAAAA_class
+  [X] asynchronously look for:
+    [X] current A rec in getA_class
+    [X] current AAAA rec in getAAAA_class
   [X] update datastructure
   [ ] if new addresses:
     [ ] update registrar

@@ -20,14 +20,18 @@ class CurrentIP(object):
   RRTYPE=None
   RRNAME=None
   RRVALUE=None
+  _trxVal=None
 
   def update(self,val):
     rc=True
     if val==self.RRVALUE:
       rc=False
     else:
-      self.RRVALUE=val
+      self._trxVal=val
     return rc
+
+  def save(self):
+      self.RRVALUE=self._trxVal
 
 
 class Controller(object):
@@ -98,6 +102,9 @@ class Controller(object):
             completed, pending = yield from asyncio.wait([self._registrar.update(ipTuple)])
             if len(pending) == 0 :
               logging.info("registrar updated")
+              for ip in self._currentIP:
+                ip.save()
+
               completed, pending = yield from asyncio.wait([self._publisher.publish(ipTuple)])
               if len(pending) == 0 :
                 logging.info("news published")

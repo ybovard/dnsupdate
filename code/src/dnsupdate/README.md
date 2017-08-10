@@ -18,7 +18,7 @@ publishNew_auth: {}
 ## code
 * Techno used: python3 asyncio
 * startup:
-  [ ] prepare datastructure:
+  [X] prepare datastructure:
     [X] A if necessary
     [X] AAAA if necessary
     [X] prepare connection to registrar
@@ -31,4 +31,4 @@ publishNew_auth: {}
   [X] update datastructure
   [ ] if new addresses:
     [ ] update registrar
-    [ ] publish info
+    [X] publish info

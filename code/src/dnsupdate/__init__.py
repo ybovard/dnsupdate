@@ -50,8 +50,8 @@ class Controller(object):
         ##TODO: PUT CODE HERE THAT SHOULD BE EXECUTED ON SIGHUP ##
         ## the new config is set already from the start script
         logging.info("Reloading dnsupdate")
-        
-    
+
+
     @asyncio.coroutine
     def pretasks(self):
         pretasks=[]
@@ -98,7 +98,7 @@ class Controller(object):
           if changed:
             ipTuple=[]
             for ip in self._currentIP:
-              ipTuple.append((ip.RRTYPE,ip.RRVALUE))
+              ipTuple.append((ip.RRNAME,ip.RRTYPE,ip.RRVALUE))
             completed, pending = yield from asyncio.wait([self._registrar.update(ipTuple)])
             if len(pending) == 0 :
               logging.info("registrar updated")
@@ -139,7 +139,7 @@ class Controller(object):
         logging.debug('registrar controller loaded: {}'.format(self._registrar.__class__.__name__))
         logging.debug('publisher controller loaded: {}'.format(self._publisher.__class__.__name__))
         logging.debug('currentIP datastructure loaded: {}'.format(self._currentIPClass))
-    
+
         ## main looap of the program
         self._loop=asyncio.get_event_loop()
         try:

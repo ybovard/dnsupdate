@@ -20,18 +20,18 @@ class CurrentIP(object):
   RRTYPE=None
   RRNAME=None
   RRVALUE=None
-  _trxVal=None
+  RRNEWVALUE=None
 
   def update(self,val):
     rc=True
     if val==self.RRVALUE:
       rc=False
     else:
-      self._trxVal=val
+      self.RRNEWVALUE=val
     return rc
 
   def save(self):
-      self.RRVALUE=self._trxVal
+      self.RRVALUE=self.RRNEWVALUE
 
 
 class Controller(object):
@@ -98,9 +98,9 @@ class Controller(object):
           if changed:
             ipTuple=[]
             for ip in self._currentIP:
-              ipTuple.append((ip.RRNAME,ip.RRTYPE,ip.RRVALUE))
+              ipTuple.append((ip.RRNAME,ip.RRTYPE,ip.RRNEWVALUE))
             completed, pending = yield from asyncio.wait([self._registrar.update(ipTuple)])
-            if len(pending) == 0 :
+            if len(completed) == 1 :
               logging.info("registrar updated")
               for ip in self._currentIP:
                 ip.save()

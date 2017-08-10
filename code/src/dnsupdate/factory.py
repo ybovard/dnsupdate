@@ -10,6 +10,8 @@ class Factory:
       obj=RegGandi()
       obj.CREDS=config['dnsupdate']['registrar_creds']
       obj.NSLIST=config['dnsupdate']['registrar_ns'].split(',')
+      obj.ZONEFILE_NAME=config['dnsupdate']['gandi_zonefile_name']
+      obj.DOMAIN=config['dnsupdate']['domain']
     else:
       raise UNKNOWN_REGISTRAR('unknown registrar {}'.format(config['dnsupdate']['registrar_class']))
     return obj

@@ -29,6 +29,6 @@ publishNew_auth: {}
     [X] current A rec in getA_class
     [X] current AAAA rec in getAAAA_class
   [X] update datastructure
-  [ ] if new addresses:
-    [ ] update registrar
+  [X] if new addresses:
+    [X] update registrar
     [X] publish info

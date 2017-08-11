@@ -68,8 +68,7 @@ class RegGandi(RegAbstract):
     if lastVersionNum == int(zoneInfo['version']):
       return self._api.domain.zone.version.new(self.CREDS, self._zoneFileId)
     else:
-      raise ERR_GANDI_ZONE_LOCKED()
-    
+      raise ERR_GANDI_ZONE_LOCKED('zone {} found but {} is active'.format(lastVersionNum,zoneInfo['version']))
 
   @asyncio.coroutine
   def update(self,ipTuple):

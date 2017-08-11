@@ -99,19 +99,15 @@ class Controller(object):
             ipTuple=[]
             for ip in self._currentIP:
               ipTuple.append((ip.RRNAME,ip.RRTYPE,ip.RRNEWVALUE))
-            completed, pending = yield from asyncio.wait([self._registrar.update(ipTuple)])
-            if len(completed) == 1 :
+            try:
+              yield from asyncio.gather(self._registrar.update(ipTuple))
               logging.info("registrar updated")
               for ip in self._currentIP:
                 ip.save()
-
-              completed, pending = yield from asyncio.wait([self._publisher.publish(ipTuple)])
-              if len(pending) == 0 :
-                logging.info("news published")
-              else:
-                logging.warning("news cannot be published")
-            else:
-              logging.warning("registrar cannot be updated")
+              yield from asyncio.gather(self._publisher.publish(ipTuple))
+              logging.info("news published")
+            except Exception as e:
+              logging.critical("{}: {}".format(e.__class__.__name__,e))
 
 
           time.sleep(float(CONTROLLER.config['dnsupdate']['refresh_rate']))

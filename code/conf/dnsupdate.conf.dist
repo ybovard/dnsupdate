@@ -1,0 +1,16 @@
+[dnsupdate]
+me: a.toto.ch
+domain: toto.ch
+refresh_rate: 3600
+
+getA_class: l2io
+getAAAA_class: l2io
+
+registrar_class: gandi
+registrar_creds: my_creds
+registrar_ns: a.reg.ch,b.reg.ch
+
+gandi_zonefile_name: my_zone
+
+publisher_class: gitter
+publisher_creds: my_gitter_creds

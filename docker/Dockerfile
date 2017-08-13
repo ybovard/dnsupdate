@@ -5,7 +5,7 @@ WORKDIR /root
 ADD code /root
 
 RUN apk update && apk upgrade \
-    && apk add python3 python3-dev gcc musl-dev \
+    && apk add python3 python3-dev gcc musl-dev ca-certificates \
     && pip3 install -r requirements.txt \
     && python3 setup.py install
 

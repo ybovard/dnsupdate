@@ -14,14 +14,14 @@ class GetIPAbstract:
     pass
 
 class GetIPL2IO(GetIPAbstract):
-  URL='http://l2.io/ip'
+  URL='https://l2.io/ip'
 
   @asyncio.coroutine
   def get(self):
     if self.RRTYPE=='A':
-      conn=aiohttp.TCPConnector(family=socket.AF_INET)
+      conn=aiohttp.TCPConnector(family=socket.AF_INET, verify_ssl=True)
     elif self.RRTYPE=='AAAA':
-      conn=aiohttp.TCPConnector(family=socket.AF_INET6)
+      conn=aiohttp.TCPConnector(family=socket.AF_INET6, verify_ssl=True)
     else:
       raise UNKNOWN_RRTYPE('only A and AAAA are allowed here, but {} recieved'.format(self.RRTYPE))
     with aiohttp.ClientSession(connector=conn) as session:

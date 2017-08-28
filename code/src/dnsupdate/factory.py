@@ -22,6 +22,7 @@ class Factory:
       obj=PubGitter()
       obj.CREDS=config['dnsupdate']['publisher_creds']
       obj.HOST=config['dnsupdate']['me']
+      obj.DEST=config['dnsupdate']['publisher_dest']
     else:
       raise UNKNOWN_PUBLISHER('unknown publisher {}'.format(config['dnsupdate']['publisher_class']))
     return obj

@@ -14,3 +14,4 @@ gandi_zonefile_name: my_zone
 
 publisher_class: gitter
 publisher_creds: my_gitter_creds
+publisher_dest: dest

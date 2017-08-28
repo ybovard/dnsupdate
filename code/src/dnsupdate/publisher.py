@@ -6,6 +6,7 @@ import sys
 class PubAbstract:
   CREDS=''
   HOST='test.toto.ch'
+  DEST='dest'
 
   @asyncio.coroutine
   def publish(self,ipTuple):
@@ -20,7 +21,7 @@ class PubGitter(PubAbstract):
   @asyncio.coroutine
   def publish(self,ipTuple):
     if self._message is None:
-      self._message={'message': '{}|changed public ip'.format(self.HOST)}
+      self._message={'message': '@{} {} changed public ip'.format(self.DEST,self.HOST)}
     with aiohttp.ClientSession() as session:
       rep=(yield from session.post(self.CREDS, json=self._message))
       try:

@@ -50,7 +50,8 @@ class RegGandi(RegAbstract):
       resolvers=aiodns.DNSResolver()
       res=yield from asyncio.wait_for(resolvers.query(rrname,rrtype),timeout=5)
       rrval=res[0].host
-    except aiodns.error.DNSError:
+    except Exception as e:
+      logging.warning(e)
       rrval=''
     finally: 
       return (rrtype,rrval)

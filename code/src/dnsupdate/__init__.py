@@ -93,7 +93,7 @@ class Controller(object):
                   logging.info("{} has been updated to {}".format(res[0], res[1]))
                   changed=True
                 else:
-                  logging.info("no change found for {}".format(res[0]))
+                  logging.debug("no change found for {}".format(res[0]))
 
           if changed:
             ipTuple=[]
@@ -209,6 +209,7 @@ def main():
     parser.add_argument("--log-config",action="store",dest="logconfig",help="logging configuration file")
     parser.add_argument("--user",action="store",dest="user", help="run as user")
     parser.add_argument("--group",action="store",dest="group", help="run as group")
+    parser.add_argument("-d", "--debug",action="store_true",dest="debug",default=False,help="run in debug mode")
 
     opts = parser.parse_args()
 
@@ -229,8 +230,10 @@ def main():
 
         if opts.foreground:
             #log to console
-            if not opts.logconfig:
+            if opts.debug:
                 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s %(levelname)s %(message)s')
+            else:
+                logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s')
         else:
             #log to syslog
             if not opts.logconfig:

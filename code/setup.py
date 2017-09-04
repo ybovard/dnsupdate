@@ -3,7 +3,7 @@ import glob
 
 
 setup(name = "dnsupdate",
-    version = "0.1.1",
+    version = "0.2.1",
     description = "DNS Updater for A and AAAA records",
     author = "__AUTHORNAME__",
     url='__WEBSITE__',

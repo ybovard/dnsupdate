@@ -7,6 +7,7 @@ import signal
 import logging
 import argparse
 import traceback
+import aiodns
 if sys.version_info[0] == 2:
   import ConfigParser as CP
 else:
@@ -56,7 +57,10 @@ class Controller(object):
     def queryDNS(self,rrname,rrtype):
       try:
         resolvers=aiodns.DNSResolver()
+        print(rrname)
+        print(rrtype)
         res=yield from asyncio.wait_for(resolvers.query(rrname,rrtype),timeout=5)
+        print("done")
         rrval=res[0].host
       except Exception as e:
         logging.warning(e)
@@ -115,13 +119,15 @@ class Controller(object):
             try:
               yield from asyncio.gather(self._registrar.update(ipTuple))
               logging.info("registrar updated")
-              for ip in self._currentIP:
-                ip.save()
               yield from asyncio.gather(self._publisher.publish(ipTuple))
               logging.info("news published")
+            except NotImplementedError as e:
+              pass
             except Exception as e:
               logging.critical("{}: {}".format(e.__class__.__name__,e))
-
+            finally:
+              for ip in self._currentIP:
+                ip.save()
 
           time.sleep(float(CONTROLLER.config['dnsupdate']['refresh_rate']))
 

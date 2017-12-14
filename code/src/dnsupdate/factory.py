@@ -12,6 +12,9 @@ class Factory:
       obj.NSLIST=config['dnsupdate']['registrar_ns'].split(',')
       obj.ZONEFILE_NAME=config['dnsupdate']['gandi_zonefile_name']
       obj.DOMAIN=config['dnsupdate']['domain']
+    elif config['dnsupdate']['registrar_class'] == 'none':
+      from .registrar import RegNone
+      obj=RegNone()
     else:
       raise UNKNOWN_REGISTRAR('unknown registrar {}'.format(config['dnsupdate']['registrar_class']))
     return obj
@@ -23,6 +26,9 @@ class Factory:
       obj.CREDS=config['dnsupdate']['publisher_creds']
       obj.HOST=config['dnsupdate']['me']
       obj.DEST=config['dnsupdate']['publisher_dest']
+    elif config['dnsupdate']['publisher_class'] == 'none':
+      from .publisher import PubNone
+      obj=PubNone()
     else:
       raise UNKNOWN_PUBLISHER('unknown publisher {}'.format(config['dnsupdate']['publisher_class']))
     return obj

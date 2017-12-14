@@ -19,6 +19,11 @@ class ERR_GANDI_ZONE_LOCKED(Exception):
   pass
 
 
+class RegNone(RegAbstract):
+  @asyncio.coroutine
+  def update(self,ipTuple):
+    raise NotImplementedError()
+
 
 class RegGandi(RegAbstract):
   ZONEFILE_NAME=''

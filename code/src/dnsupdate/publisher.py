@@ -15,6 +15,13 @@ class PubAbstract:
 class ERR_PUBGITTER_BAD_RESPONSE(Exception):
   pass
 
+
+class PubNone(PubAbstract):
+  @asyncio.coroutine
+  def publish(self,ipTuple):
+    raise NotImplementedError()
+
+
 class PubGitter(PubAbstract):
   _message=None
 

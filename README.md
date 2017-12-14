@@ -7,7 +7,7 @@ The goal of this project is to provide a daemon to get the public IP (IPv4 and I
 
 # Configuration
 * /etc/dnsupdate/dnsupdate.conf
-'''
+```
 [dnsupdate]
 me: a.toto.ch # record
 domain: toto.ch # domain name
@@ -21,4 +21,4 @@ registrar_class: <registrar> : class for the registrar
 publisher_class: <publisher_class> # if publishing a message on a chat is needed, the type should be set here. If not, 'none'
 publisher_creds: <my_creds>
 publisher_dest: <dest_user>
-'''
+```

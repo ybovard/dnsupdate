@@ -8,9 +8,6 @@ class RegAbstract:
   CREDS=None
   NSLIST=[]
 
-  @asyncio.coroutine
-  def getIP(self,rrname,rrtype):
-    pass
   def update(self,ipTuple):
     pass
 
@@ -42,19 +39,6 @@ class RegGandi(RegAbstract):
       if z['name'] == zoneFileName:
         return z['id']
     raise ERR_GANDI_ZONE_NOT_FOUND()
-
-
-  @asyncio.coroutine
-  def getIP(self,rrname,rrtype):
-    try:
-      resolvers=aiodns.DNSResolver()
-      res=yield from asyncio.wait_for(resolvers.query(rrname,rrtype),timeout=5)
-      rrval=res[0].host
-    except Exception as e:
-      logging.warning(e)
-      rrval=''
-    finally: 
-      return (rrtype,rrval)
 
 
   def _getNewVersion(self):

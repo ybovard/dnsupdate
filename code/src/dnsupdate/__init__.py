@@ -53,11 +53,24 @@ class Controller(object):
 
 
     @asyncio.coroutine
+    def queryDNS(self,rrname,rrtype):
+      try:
+        resolvers=aiodns.DNSResolver()
+        res=yield from asyncio.wait_for(resolvers.query(rrname,rrtype),timeout=5)
+        rrval=res[0].host
+      except Exception as e:
+        logging.warning(e)
+        rrval=''
+      finally:
+        return (rrtype,rrval)
+
+
+    @asyncio.coroutine
     def pretasks(self):
         pretasks=[]
         self._currentIP=[]
         for ipClass in self._currentIPClass:
-          pretasks.append(self._registrar.getIP('{}.'.format(ipClass.RRNAME),ipClass.RRTYPE))
+          pretasks.append(self.queryDNS('{}.'.format(ipClass.RRNAME),ipClass.RRTYPE))
           ip=CurrentIP()
           ip.RRTYPE=ipClass.RRTYPE
           ip.RRNAME=ipClass.RRNAME

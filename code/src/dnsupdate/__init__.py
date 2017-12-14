@@ -57,10 +57,7 @@ class Controller(object):
     def queryDNS(self,rrname,rrtype):
       try:
         resolvers=aiodns.DNSResolver()
-        print(rrname)
-        print(rrtype)
         res=yield from asyncio.wait_for(resolvers.query(rrname,rrtype),timeout=5)
-        print("done")
         rrval=res[0].host
       except Exception as e:
         logging.warning(e)
@@ -107,7 +104,7 @@ class Controller(object):
             for ip in self._currentIP:
               if ip.RRTYPE==res[0]:
                 if ip.update(res[1]):
-                  logging.info("{} has been updated to {}".format(res[0], res[1]))
+                  logging.info("{} has changed to {}".format(res[0], res[1]))
                   changed=True
                 else:
                   logging.debug("no change found for {}".format(res[0]))

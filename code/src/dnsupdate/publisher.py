@@ -16,12 +16,26 @@ class ERR_PUBGITTER_BAD_RESPONSE(Exception):
   pass
 
 
+'''
+publish nothing. Use for exemple when syslog message are enough
+
+config parameters:
+  publisher_class: none
+'''
 class PubNone(PubAbstract):
   @asyncio.coroutine
   def publish(self,ipTuple):
     raise NotImplementedError()
 
 
+'''
+Publish news on a gitter accout
+
+config parameters:
+  publisher_class: gitter
+  publisher_creds: API secret key
+  publisher_dest: name of the reciever
+'''
 class PubGitter(PubAbstract):
   _message=None
 

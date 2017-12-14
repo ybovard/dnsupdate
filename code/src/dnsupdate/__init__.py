@@ -53,6 +53,9 @@ class Controller(object):
         logging.info("Reloading dnsupdate")
 
 
+    '''
+    sends a query to the DNS resolver. Used for warm up
+    '''
     @asyncio.coroutine
     def queryDNS(self,rrname,rrtype):
       try:
@@ -66,6 +69,9 @@ class Controller(object):
         return (rrtype,rrval)
 
 
+    '''
+    initialize the IPClass with the current values given from DNS resolvers
+    '''
     @asyncio.coroutine
     def pretasks(self):
         pretasks=[]
@@ -89,6 +95,10 @@ class Controller(object):
               ip.update(res[1])
           
 
+    '''
+    every <refresh_rate> seconds, looks for the current IP address
+    If needed, update the registrar and publish the new IP
+    '''
     @asyncio.coroutine
     def mainloop(self):
         while self.stay_alive:
@@ -137,25 +147,27 @@ class Controller(object):
 
 
     def run(self):
+        # load configuration
         logging.debug('configuration loaded')
         for sec in CONTROLLER.config.sections():
           logging.debug('{: <2s}{}'.format(' ',sec))
           for opt,val in CONTROLLER.config[sec].items():
             logging.debug('{: <4s}{}: {}'.format(' ',opt,val))
 
+        # create objects
         facto=Factory()
         self._registrar=facto.getRegistrar(CONTROLLER.config)
         self._publisher=facto.getPublisher(CONTROLLER.config)
         self._currentIPClass=facto.getWANIP(CONTROLLER.config)
-
         logging.debug('registrar controller loaded: {}'.format(self._registrar.__class__.__name__))
         logging.debug('publisher controller loaded: {}'.format(self._publisher.__class__.__name__))
         logging.debug('currentIP datastructure loaded: {}'.format(self._currentIPClass))
 
-        ## main looap of the program
         self._loop=asyncio.get_event_loop()
         try:
+          # warm up
           self._loop.run_until_complete(self.pretasks())
+          # main loop
           self._loop.run_until_complete(self.mainloop())
         except KeyboardInterrupt:
           self.stay_alive=False

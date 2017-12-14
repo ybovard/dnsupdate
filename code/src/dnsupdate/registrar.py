@@ -3,7 +3,9 @@ import aiodns
 import xmlrpc.client
 import logging
 
-
+'''
+In case of an address change, they could be directly changed on the registrar. This class should be sub-classed for each registrar
+'''
 class RegAbstract:
   CREDS=None
   NSLIST=[]
@@ -11,19 +13,31 @@ class RegAbstract:
   def update(self,ipTuple):
     pass
 
+'''
+Used when no registrar update are necessary
 
-
-class ERR_GANDI_ZONE_NOT_FOUND(Exception):
-  pass
-class ERR_GANDI_ZONE_LOCKED(Exception):
-  pass
-
-
+config parameters:
+  registrar_class: none
+'''
 class RegNone(RegAbstract):
   @asyncio.coroutine
   def update(self,ipTuple):
     raise NotImplementedError()
 
+
+'''
+Change IPs on Gandi web site
+
+config parameters:
+  registrar_class: gandi
+  registrar_creds: credentials for the API
+  registrar_ns: a.reg.ch,b.reg.ch
+  gandi_zonefile_name: zone file to change
+'''
+class ERR_GANDI_ZONE_NOT_FOUND(Exception):
+  pass
+class ERR_GANDI_ZONE_LOCKED(Exception):
+  pass
 
 class RegGandi(RegAbstract):
   ZONEFILE_NAME=''

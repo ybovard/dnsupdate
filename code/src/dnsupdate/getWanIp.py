@@ -13,6 +13,13 @@ class GetIPAbstract:
   def get(self):
     pass
 
+'''
+Look for the public ip on the website https://l2.io/ip
+
+config parameters:
+  getA_class: l2io
+  getAAAA_class: l2io
+'''
 class GetIPL2IO(GetIPAbstract):
   URL='https://l2.io/ip'
 
